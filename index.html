@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="프리미엄 로또 번호 추첨 및 시뮬레이터 PRO MAX">
+<title>로또 PRO MAX - 프리미엄 시뮬레이터</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --primary: #6c5ce7;
+    --secondary: #00cec9;
+    --accent: #fd79a8;
+    --dark: #0f1016;
+    --card-bg: rgba(25, 26, 35, 0.6);
+    --border: rgba(255, 255, 255, 0.1);
+    --text-main: #ffffff;
+    --text-muted: #a0a5b1;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Outfit', sans-serif;
+    background: radial-gradient(circle at 15% 50%, #1a1b3c, var(--dark) 60%);
+    color: var(--text-main);
+    min-height: 100vh;
+    padding-bottom: 50px;
+  }
+
+  .header {
+    position: sticky;
+    top: 0;
+    background: rgba(15, 16, 22, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 20px;
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    z-index: 1000;
+    border-bottom: 1px solid var(--border);
+    text-shadow: 0 0 20px rgba(108, 92, 231, 0.5);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-image: linear-gradient(90deg, #6c5ce7, #00cec9);
+  }
+
+  .header-icon {
+    -webkit-text-fill-color: initial;
+    display: inline-block;
+  }
+
+  .container {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .card {
+    background: var(--card-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 25px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  button {
+    padding: 14px 24px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  button:hover {
+    background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05));
+    transform: scale(1.05);
+    border-color: var(--secondary);
+    box-shadow: 0 0 20px rgba(0, 206, 201, 0.4);
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+    border: none;
+  }
+  
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+    border-color: transparent;
+    box-shadow: 0 0 20px rgba(108, 92, 231, 0.6);
+  }
+
+  .ball {
+    width: 44px;
+    height: 44px;
+    line-height: 44px;
+    border-radius: 50%;
+    text-align: center;
+    font-weight: 900;
+    font-size: 1.1rem;
+    margin: 4px;
+    display: inline-block;
+    color: white;
+    box-shadow: inset -3px -3px 6px rgba(0,0,0,0.4), 0 4px 8px rgba(0,0,0,0.3);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    transition: transform 0.2s ease;
+  }
+  
+  .ball:hover {
+    transform: scale(1.1) rotate(5deg);
+  }
+
+  .sectionTitle {
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-right: 10px;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+    padding: 10px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 12px;
+  }
+
+  .statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+  }
+
+  .statCard {
+    background: rgba(0,0,0,0.3);
+    padding: 15px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.05);
+    text-align: center;
+  }
+
+  .statName {
+    font-size: 1.2rem;
+    font-weight: 900;
+    margin-bottom: 5px;
+  }
+
+  .statValue {
+    font-size: 1.5rem;
+    color: var(--secondary);
+    font-weight: 300;
+  }
+
+  .bar {
+    height: 6px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 12px;
+  }
+
+  .fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00cec9, #6c5ce7);
+    width: 0%;
+    transition: width 0.8s cubic-bezier(0.1, 0.8, 0.2, 1);
+    box-shadow: 0 0 10px rgba(0, 206, 201, 0.8);
+  }
+
+  .winLog {
+    padding: 12px 15px;
+    margin: 8px 0;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 500;
+    transition: transform 0.2s;
+    background: rgba(255,255,255,0.05);
+    border-left: 5px solid transparent;
+  }
+  
+  .winLog:hover {
+    transform: translateX(5px);
+    background: rgba(255,255,255,0.1);
+  }
+
+  .rank1 { border-left-color: #f1c40f; }
+  .rank2 { border-left-color: #3498db; }
+  .rank3 { border-left-color: #e74c3c; }
+
+  .rank-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 900;
+    background: rgba(0,0,0,0.3);
+  }
+  
+  .rank1 .rank-badge { color: #f1c40f; }
+  .rank2 .rank-badge { color: #3498db; }
+  .rank3 .rank-badge { color: #e74c3c; }
+
+  #logList {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 10px;
+  }
+
+  #logList::-webkit-scrollbar {
+    width: 6px;
+  }
+  #logList::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.1);
+    border-radius: 10px;
+  }
+  #logList::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 10px;
+  }
+
+  .title-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+  }
+
+  h1, h2, h3 { margin: 0; }
+
+  .empty-state {
+    text-align: center;
+    padding: 30px;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <span class="header-icon">🎰</span> 로또 PRO MAX
+</div>
+
+<div class="container">
+
+  <div class="card controls">
+    <button class="btn-primary" onclick="generateWin()">🎯 당첨번호 생성</button>
+    <button onclick="draw()">🎰 5세트 추첨</button>
+    <button onclick="runSim(10000)">📊 1만 번</button>
+    <button onclick="runSim(100000)">📊 10만 번</button>
+    <button onclick="runSim(1000000)">📊 100만 번</button>
+  </div>
+
+  <div id="winBox" class="card">
+    <div class="empty-state">🎯 '당첨번호 생성'을 눌러주세요</div>
+  </div>
+
+  <div id="result"></div>
+
+  <div class="card">
+    <div class="title-area">
+      🏆 <h2>당첨 기록</h2> <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 300;">(1~3등 한정)</span>
+    </div>
+    <div id="logList">
+      <div class="empty-state">아직 기록이 없습니다.</div>
+    </div>
+  </div>
+
+  <div id="stats" class="card">
+    <div class="title-area">
+      📊 <h2>누적 통계</h2>
+    </div>
+    <div class="empty-state">통계 데이터가 없습니다.</div>
+  </div>
+
+</div>
+
+<script>
+let currentWin = null;
+let totalDraws = 0;
+
+let totalStats = {
+  "1등":0, "2등":0, "3등":0, "4등":0, "5등":0, "꽝":0
+};
+
+let winLogs = [];
+
+function rand(){
+  return Math.floor(Math.random()*45)+1;
+}
+
+function gen(){
+  let a=[];
+  while(a.length<6){
+    let n=rand();
+    if(!a.includes(n)) a.push(n);
+  }
+  a.sort((x,y)=>x-y);
+  let b;
+  do{ b=rand(); }while(a.includes(b));
+  return {a,b};
+}
+
+function color(n){
+  if(n<=10) return "#f1c40f"; // yellow
+  if(n<=20) return "#3498db"; // blue
+  if(n<=30) return "#e74c3c"; // red
+  if(n<=40) return "#2ecc71"; // green
+  return "#9b59b6"; // purple
+}
+
+function generateWin(){
+  currentWin = gen();
+  renderWin();
+}
+
+function renderWin(){
+  let box = document.getElementById("winBox");
+  box.innerHTML = "";
+
+  if(!currentWin){
+    box.innerHTML = `<div class="empty-state">🎯 당첨번호 생성 필요</div>`;
+    return;
+  }
+
+  let line = document.createElement("div");
+  line.className = "row";
+
+  line.innerHTML = `<span class="sectionTitle">👑 MAIN:</span>`;
+  currentWin.a.forEach(n=>{
+    line.innerHTML += `<span class="ball" style="background:${color(n)}">${n}</span>`;
+  });
+
+  line.innerHTML += `<span class="sectionTitle" style="margin-left: 20px;">+ BONUS:</span>`;
+  line.innerHTML += `<span class="ball" style="background: linear-gradient(135deg, #7f8c8d, #34495e)">${currentWin.b}</span>`;
+
+  box.appendChild(line);
+}
+
+function getRank(hit,bonus){
+  if(hit===6) return "1등";
+  if(hit===5 && bonus) return "2등";
+  if(hit===5) return "3등";
+  if(hit===4) return "4등";
+  if(hit===3) return "5등";
+  return "꽝";
+}
+
+function draw(){
+  if(!currentWin){
+    alert("당첨번호를 먼저 생성해주세요!");
+    return;
+  }
+
+  let res = document.getElementById("result");
+  res.innerHTML = "";
+
+  for(let i=0;i<5;i++){
+    let {a,b} = gen();
+    process(a,b);
+
+    let div = document.createElement("div");
+    div.className="card row";
+    div.style.animation = `fadeIn 0.3s ease ${i*0.05}s both`;
+    
+    let hit = a.filter(n=>currentWin.a.includes(n)).length;
+    let bonus = (b===currentWin.b);
+    let rank = getRank(hit,bonus);
+
+    div.innerHTML = `<span class="sectionTitle">SET ${i+1}:</span>`;
+    a.forEach(n=>{
+      let isHit = currentWin.a.includes(n);
+      let bg = isHit ? color(n) : 'rgba(255,255,255,0.1)';
+      let op = isHit ? '1' : '0.5';
+      div.innerHTML += `<span class="ball" style="background:${bg}; opacity:${op}; box-shadow: ${isHit ? '' : 'none'}">${n}</span>`;
+    });
+
+    let isBonusHit = (b===currentWin.b);
+    let bgBonus = isBonusHit ? 'linear-gradient(135deg, #7f8c8d, #34495e)' : 'rgba(255,255,255,0.1)';
+    let opBonus = isBonusHit ? '1' : '0.5';
+    
+    div.innerHTML += `<span class="sectionTitle" style="margin-left: 15px;">+</span> <span class="ball" style="background:${bgBonus}; opacity:${opBonus}; box-shadow: ${isBonusHit ? '' : 'none'}">${b}</span>`;
+    
+    let rankColor = rank.includes("1") ? "#f1c40f" : rank.includes("2") ? "#3498db" : rank.includes("3") ? "#e74c3c" : rank.includes("꽝") ? "var(--text-muted)" : "white";
+    div.innerHTML += `<span style="margin-left: auto; font-weight: 900; color: ${rankColor}; font-size: 1.2rem;">${rank}</span>`;
+
+    res.appendChild(div);
+  }
+
+  updateLogs();
+  renderStats();
+}
+
+function process(a,b){
+  let hit = a.filter(n=>currentWin.a.includes(n)).length;
+  let bonus = (b===currentWin.b);
+  let rank = getRank(hit,bonus);
+
+  totalStats[rank]++;
+  totalDraws++;
+
+  if(rank==="1등" || rank==="2등" || rank==="3등"){
+    winLogs.unshift({rank,main:a,bonus:b, id: totalDraws}); // add to start
+  }
+}
+
+function runSim(count){
+  if(!currentWin){
+    alert("당첨번호를 먼저 생성해주세요!");
+    return;
+  }
+  
+  for(let i=0;i<count;i++){
+    let {a,b} = gen();
+    process(a,b);
+  }
+
+  let res = document.getElementById("result");
+  res.innerHTML = `<div class="card" style="text-align:center; color: var(--secondary); font-weight: bold;">✅ ${count.toLocaleString()}번의 시뮬레이션이 완료되었습니다.</div>`;
+
+  updateLogs();
+  renderStats();
+}
+
+function updateLogs(){
+  let box = document.getElementById("logList");
+  
+  if (winLogs.length === 0) {
+    box.innerHTML = `<div class="empty-state">아직 기록이 없습니다.</div>`;
+    return;
+  }
+
+  box.innerHTML = "";
+  
+  let latest = winLogs.slice(0,20);
+
+  latest.forEach(log=>{
+    let cls =
+      log.rank==="1등" ? "rank1" :
+      log.rank==="2등" ? "rank2" :
+      "rank3";
+
+    box.innerHTML += `
+      <div class="winLog ${cls}">
+        <div>
+          <span class="rank-badge">${log.rank}</span>
+          <span style="font-size: 0.8rem; color: var(--text-muted); margin-left: 10px;">#${log.id.toLocaleString()}</span>
+        </div>
+        <div style="display:flex; gap: 4px; align-items:center;">
+          ${log.main.map(n=>`<span class="ball" style="width:28px; height:28px; line-height:28px; font-size:0.8rem; background:${color(n)}">${n}</span>`).join('')}
+          <span style="color:var(--text-muted); margin:0 5px;">+</span>
+          <span class="ball" style="width:28px; height:28px; line-height:28px; font-size:0.8rem; background:#555">${log.bonus}</span>
+        </div>
+      </div>
+    `;
+  });
+}
+
+function renderStats(){
+  let box = document.getElementById("stats");
+  box.innerHTML = `
+    <div class="title-area" style="justify-content: space-between; margin-bottom: 5px;">
+      <div style="display:flex; align-items:center; gap: 10px;">📊 <h2>누적 통계</h2></div>
+      <div style="font-size: 0.9rem; color: var(--secondary);">총 추첨: ${totalDraws.toLocaleString()} 번</div>
+    </div>
+  `;
+
+  let total = totalDraws;
+  if(total === 0) {
+    box.innerHTML += `<div class="empty-state">통계 데이터가 없습니다.</div>`;
+    return;
+  }
+
+  let grid = document.createElement("div");
+  grid.className="statsGrid";
+
+  let order = ["1등", "2등", "3등", "4등", "5등", "꽝"];
+
+  order.forEach(k => {
+    let count = totalStats[k];
+    let percent = total ? (count/total)*100 : 0;
+    
+    let displayPercent = percent < 0.0001 && count > 0 ? "~0.0001" : percent.toFixed(4);
+    if(count === 0) displayPercent = "0";
+    else if(percent >= 1) displayPercent = percent.toFixed(1);
+
+    let card = document.createElement("div");
+    card.className="statCard";
+    
+    let highlightColor = k==="1등"?"#f1c40f":k==="2등"?"#3498db":k==="3등"?"#e74c3c":"var(--secondary)";
+
+    card.innerHTML = `
+      <div class="statName" style="color: ${highlightColor}">${k}</div>
+      <div class="statValue">${count.toLocaleString()}</div>
+      <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">${displayPercent}%</div>
+      <div class="bar">
+        <div class="fill" style="width:${percent}%; background: ${highlightColor}; box-shadow: 0 0 10px ${highlightColor}"></div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  box.appendChild(grid);
+}
+
+const style = document.createElement('style');
+style.innerHTML = `
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+`;
+document.head.appendChild(style);
+</script>
+</body>
+</html>
